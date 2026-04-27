@@ -1,0 +1,236 @@
+package com.loan;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class LoanSystemServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    Connection getConnection() {
+        try {
+            return DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/loan_system",
+                "root",
+                "password"   // 🔴 change to your MySQL password
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+  /*  protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        PrintWriter out = res.getWriter();
+
+        out.println("<html><body>");
+        out.println("<h1>Loan Management System</h1>");
+
+        out.println("<h2>Add Customer</h2>");
+        out.println("<form method='post'>");
+        out.println("<input type='hidden' name='action' value='addCustomer'>");
+        out.println("Name: <input name='name'><br>");
+        out.println("Phone: <input name='phone'><br>");
+        out.println("Email: <input name='email'><br>");
+        out.println("Address: <input name='address'><br>");
+        out.println("<input type='submit' value='Add Customer'>");
+        out.println("</form><hr>");
+
+        out.println("<h2>Apply Loan</h2>");
+        out.println("<form method='post'>");
+        out.println("<input type='hidden' name='action' value='applyLoan'>");
+        out.println("Customer ID: <input name='cid'><br>");
+        out.println("Loan Type: <input name='type'><br>");
+        out.println("Amount: <input name='amount'><br>");
+        out.println("Interest: <input name='interest'><br>");
+        out.println("Duration: <input name='duration'><br>");
+        out.println("<input type='submit' value='Apply Loan'>");
+        out.println("</form><hr>");
+
+        out.println("<h2>Make Payment</h2>");
+        out.println("<form method='post'>");
+        out.println("<input type='hidden' name='action' value='payment'>");
+        out.println("Loan ID: <input name='loanid'><br>");
+        out.println("Amount: <input name='pay'><br>");
+        out.println("Mode: <input name='mode'><br>");
+        out.println("<input type='submit' value='Pay'>");
+        out.println("</form>");
+
+        out.println("</body></html>");
+    }*/
+    
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Loan System</title>
+    <style>
+    body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        margin: 0;
+    }
+
+    .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #38bdf8;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: none;
+    }
+
+    button {
+        background: #38bdf8;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background: #0ea5e9;
+    }
+    </style>
+    </head>
+
+    <body>
+
+    <div class='container'>
+
+    <h1>Loan Management System</h1>
+
+    <div class='card'>
+    <h2>Add Customer</h2>
+    <form method='post'>
+    <input type='hidden' name='action' value='addCustomer'>
+    <input name='name' placeholder='Name'>
+    <input name='phone' placeholder='Phone'>
+    <input name='email' placeholder='Email'>
+    <input name='address' placeholder='Address'>
+    <button>Add Customer</button>
+    </form>
+    </div>
+
+    <div class='card'>
+    <h2>Apply Loan</h2>
+    <form method='post'>
+    <input type='hidden' name='action' value='applyLoan'>
+    <input name='cid' placeholder='Customer ID'>
+    <input name='type' placeholder='Loan Type'>
+    <input name='amount' placeholder='Amount'>
+    <input name='interest' placeholder='Interest Rate'>
+    <input name='duration' placeholder='Duration (months)'>
+    <button>Apply Loan</button>
+    </form>
+    </div>
+
+    <div class='card'>
+    <h2>Make Payment</h2>
+    <form method='post'>
+    <input type='hidden' name='action' value='payment'>
+    <input name='loanid' placeholder='Loan ID'>
+    <input name='pay' placeholder='Amount'>
+    <input name='mode' placeholder='Payment Mode'>
+    <button>Pay</button>
+    </form>
+    </div>
+
+    </div>
+
+    </body>
+    </html>
+    """);
+    }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        String action = req.getParameter("action");
+
+        if ("addCustomer".equals(action)) addCustomer(req);
+        else if ("applyLoan".equals(action)) applyLoan(req);
+        else if ("payment".equals(action)) makePayment(req);
+
+        res.sendRedirect("LoanSystemServlet");
+    }
+
+    void addCustomer(HttpServletRequest req) {
+        try {
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO Customer(name,phone,email,address) VALUES(?,?,?,?)"
+            );
+            ps.setString(1, req.getParameter("name"));
+            ps.setString(2, req.getParameter("phone"));
+            ps.setString(3, req.getParameter("email"));
+            ps.setString(4, req.getParameter("address"));
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    void applyLoan(HttpServletRequest req) {
+        try {
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO Loan(customer_id,loan_type,amount,interest_rate,duration,applied_date) VALUES(?,?,?,?,?,CURDATE())"
+            );
+            ps.setInt(1, Integer.parseInt(req.getParameter("cid")));
+            ps.setString(2, req.getParameter("type"));
+            ps.setDouble(3, Double.parseDouble(req.getParameter("amount")));
+            ps.setDouble(4, Double.parseDouble(req.getParameter("interest")));
+            ps.setInt(5, Integer.parseInt(req.getParameter("duration")));
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    void makePayment(HttpServletRequest req) {
+        try {
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO Payment(loan_id,amount_paid,payment_date,payment_mode) VALUES(?,?,CURDATE(),?)"
+            );
+            ps.setInt(1, Integer.parseInt(req.getParameter("loanid")));
+            ps.setDouble(2, Double.parseDouble(req.getParameter("pay")));
+            ps.setString(3, req.getParameter("mode"));
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+}
