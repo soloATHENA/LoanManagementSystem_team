@@ -24,9 +24,6 @@ A full-stack Java Desktop Application built with modern **Glassmorphism** UI pri
 *   **Database:** MySQL
 *   **Connectivity:** JDBC (Java Database Connectivity) API
 
-## 📸 Screenshots
-
-*(Replace this text with your dragged-and-dropped screenshots of the Login, Customer, and Employee screens)*
 
 ## 🚀 How to Run Locally
 
