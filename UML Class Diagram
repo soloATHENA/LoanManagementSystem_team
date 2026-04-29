@@ -1,3 +1,4 @@
+```
 classDiagram
     class LoanManagementApp {
         +main(String[] args)
@@ -49,3 +50,4 @@ classDiagram
     MainFrame --> EmployeeScreens : Routes Employee
     CustomerScreens ..> DatabaseConnection : SQL Queries (CRUD)
     EmployeeScreens ..> DatabaseConnection : SQL Queries (CRUD)
+```
